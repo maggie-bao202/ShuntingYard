@@ -1,0 +1,28 @@
+#include <iostream>
+#include "Node.h"
+
+using namespace std;
+
+Node :: Node(char* newvalue){
+  newvalue = value;
+  left = NULL;
+  right = NULL;
+}
+
+Node :: getValue(){
+  return value;
+}
+
+Node :: getLeft(){
+  return left;
+}
+
+Node :: getRight(){
+  return right;
+}
+
+Node :: ~Node(){
+  delete value;
+  left = NULL;
+  right = NULL;
+}
