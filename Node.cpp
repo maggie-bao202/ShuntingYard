@@ -9,27 +9,27 @@ Node :: Node(char* newvalue){
   right = NULL;
 }
 
-Node :: getValue(){
+Node* Node :: getValue(){
   return value;
 }
 
-Node :: getLeft(){
+Node* Node :: getLeft(){
   return left;
 }
 
-Node :: getRight(){
+Node* Node :: getRight(){
   return right;
 }
 
-Node :: setValue(char* newvalue){
+void Node :: setValue(char* newvalue){
   value = newvalue;
 }
 
-Node :: setLeft(char* newleft){
+void Node :: setLeft(char* newleft){
   left = newleft;
 }
 
-Node :: setRight(char* newright){
+void Node :: setRight(char* newright){
   right = newright;
 }
 
