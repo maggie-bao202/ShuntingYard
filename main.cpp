@@ -1,6 +1,7 @@
 #include <iostream>
 #include "Node.h"
 #include <vector>
+#include <cctype.h>
 
 using namespace std;
 
@@ -23,10 +24,7 @@ int main(){
     Node* node = new Node(op);
     firstHead.push_back(node);
     cout << "Node added." << endl;
-    vector<Node*>::iterator it; //create iterator
-    for(it = firstHead.begin(); it != firstHead.end(); it++){
-      cout << (it)->getValue();
-    }
+    push(stackHead, firstHead);
   }
   return 0;
 }
@@ -35,8 +33,16 @@ void pop(Node* head){
   
 }
 
-void push(){
-  
+void push(Node* stackHead, vector<Node*>* firstHead){
+  vector<Node*>::iterator it; //create iterator
+  for(it = firstHead.begin(); it != firstHead.end(); it++){
+    if(isdigit((*it)->getValue())){
+      Node* node = new Node((*it)->getValue());
+      stackHead->setRight(node);
+      node->setLeft(stackHead);
+      
+    }
+  }
 }
 
 void peek(){
