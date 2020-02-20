@@ -1,25 +1,32 @@
 #include <iostream>
 #include "Node.h"
 #include <vector>
-#include <cctype.h>
+#include <iterator>
+#include <stack>
+#include <map>
+#include <vector>
+#include <cstring>
+#include <cctype>
 
 using namespace std;
 
 //STACK FUNCTIONS
-void pop(Node*);
-void push(Node* &, Node*);
+void pop(Node* &);
+void push(Node* &, char*);
 char* peek(Node*);
 
 //QUEUE FUNCTIONS
-void enqueue(Node*, Node*);
+void enqueue(Node*&, Node*, char*);
 void dequeue(Node*);
 
 void infix(Node*);
 void prefix(Node*);
 void postfix(Node*);
 
+bool checkInt(char*);
+
 int main(){
-  vector<char*> vinput = new vector<char*>;
+  vector<char*> vinput;
   Node* stackHead = NULL;
   Node* queueHead = NULL;
   char* input = new char[40];
@@ -43,23 +50,23 @@ int main(){
   char* temp = new char[strlen(input)]();
   int counter = 0;
   for (int i = 0; i < strlen(input); i++){
-    if (input[i] != " "){
+    if (input[i] != ' '){
       temp[counter++] = input[i];
     }
     else {
-      vinput->push_back(temp);
+      vinput.push_back(temp);
       temp = new char[strlen(input)]();
       counter = 0;
     }
   }
-  if (temp){
-    vinput->push_back(temp);
+  if (temp != NULL){
+    vinput.push_back(temp);
   }
 
   vector<char*> :: iterator it;
-  for (it = vinput->begin(); it != vinput->end(); it++){
+  for (it = vinput.begin(); it != vinput.end(); it++){
     if (isdigit(*it)){
-      enqueue(queueHead, *it);
+      enqueue(queueHead, queueHead, *it);
     }
     if (strcmp(*it, "(") == 0){
       Node* temp = new Node(*it);
@@ -67,9 +74,8 @@ int main(){
     }
     if (strcmp(*it, ")") == 0){
       while (strcmp(peek(stackHead), "(") != 0){
+	enqueue(queueHead, queueHead, peek(stackHead));
 	pop(stackHead);
-	enqueue(queueHead, pop(stackHead));
-	//
       }
     }
     else {
@@ -78,10 +84,10 @@ int main(){
 	     && associativity[*it] == 'a'))
 	     && strcmp(peek(stackHead), " ") != 0
 	     && strcmp(peek(stackHead), "(") != 0){
-      enqueue(queueHead, );
+      enqueue(queueHead, queueHead, peek(stackHead));
       pop(stackHead);
-      }
-    Node* temp0 = new Node(*it);
+    }
+    /*Node* temp0 = new Node(*it);
     push(stackHead, temp0);
   }
   Node* node = NULL;
@@ -90,36 +96,29 @@ int main(){
   }
   while(dequeue(queueHead)){
     if (!isdigit(dequeue(queueHead)){
-	Node* temp1 = new Node
+    Node* temp1 = new Node*/
   return 0;
 }
 
 void pop(Node* &stackHead){
-  Node* current = stackHead;
-  if (stackHead == NULL){
-    return;
-  }
-  if (current->getNext()->getNext() != NULL){
-    current = current->getNext();
-  }
-  //char* value = current->getNext()->getValue();
-  Node* temp = current->getNext();
-  current->setNext(NULL);
+  Node* temp = stackHead;
+  stackHead = stackHead->getNext();
   delete temp;
-  
+  temp = NULL;
 }
 
-void push(Node* &stackHead, Node* node){
-  Node* current = stackHead;
+void push(Node* &stackHead, char* value){
   if (stackHead == NULL){
-    stackHead = node;
+    Node* current = new Node(value);
+    stackHead = current;
     return;
   }
-  while (current->getNext() != NULL){
-    current = current->getNext();
-  }
-  current->setNext(node);
-  return;
+  else{
+    Node* current = new Node(value);
+    Node* temp = stackHead;
+    stackHead = current;
+    current->setNext(temp);
+    return;
 }
 
 char* peek(Node* stackHead){
@@ -133,32 +132,35 @@ char* peek(Node* stackHead){
   return value;
 }
 
- void enqueue(Node* &queueHead, char* value){
-   if (queueHead == NULL){
-     queueHead = new Node(value);
+void enqueue(Node* &queueHead, Node* node, char* value){//insert tail
+   if (node == NULL){ //if node pointer does not exist
+     Node* current = new Node(value); //make student the current node pointer
+     head = current; //make current the head
      return;
    }
-   if (queueHead->getNext() == NULL){
-     Node* temp = new Node(value);
-     head->setNext(value);
+   if (node->getNext() == NULL){//if next node pointer does not exist
+     Node* current = new Node(value);
+     node->setNext(current); //set next node pointer as the current
      return;
    }
-   Node* temp = queueHead->getNext();
-   enqueue(temp, value);
+   enqueue(queueHead, node->getNext(), value); //recursive function returns itself
  }
-
-void dequeue(Node* &queueHead){
+      
+void dequeue(Node* &queueHead){//remove head
   if (queueHead != NULL){
-    Node* temp = head;
+    Node* temp = queueHead;
     head = head->getNext();
+    temp->setNext(NULL);
     delete temp;
   }
   else{
     return NULL;
   }
 }
-
+ 
 void infix(Node* node){
   if (node != NULL){
-    if(parent
+    if(node){
+    }
+  }
 }
