@@ -5,6 +5,7 @@ using namespace std;
 
 Node :: Node(char* newvalue){
   value = newvalue;
+  next = NULL;
   left = NULL;
   right = NULL;
 }
@@ -21,6 +22,10 @@ Node* Node :: getRight(){
   return right;
 }
 
+Node* Node :: getNext(){
+  return next;
+}
+
 void Node :: setValue(char* newvalue){
   value = newvalue;
 }
@@ -33,8 +38,12 @@ void Node :: setRight(Node* newright){
   right = newright;
 }
 
+void Node :: setNext(Node* newnext){
+  next = newnext;
+}
+
 Node :: ~Node(){
-  delete value;
-  left = NULL;
-  right = NULL;
+  //delete value;
+  //left = NULL;
+  //right = NULL;
 }
