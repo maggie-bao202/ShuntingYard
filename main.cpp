@@ -1,10 +1,7 @@
 #include <iostream>
 #include "Node.h"
-#include <vector>
 #include <iterator>
-#include <stack>
 #include <map>
-#include <vector>
 #include <cstring>
 #include <cctype>
 
@@ -24,7 +21,7 @@ void infix(Node*);
 void prefix(Node*);
 void postfix(Node*);
 
-//Node* tail(Node*);
+Node* tail(Node*);
 
 int main(){
   Node* stackHead = NULL;
@@ -80,17 +77,6 @@ int main(){
     enqueue(queueHead, queueHead, peek(stackHead));
     pop(stackHead);
   }
-  char* postfix = new char[100];
-	int num = 0;
-	while (queueHead != NULL) { // Empty queue into a char array.
-		char qHead = peek(queueHead);
-		dequeue(queueHead);
-		postfix[num] = qHead;
-		postfix[num+1] = ' ';
-		num += 2;
-	}
-	postfix[num] = '\0';
-	cout << postfix << endl;
   tree(queueHead, stackHead);
   prefix(expression);
   postfix(expression);
@@ -108,7 +94,7 @@ int main(){
       return;
     }
 }
-/*
+
 Node* tail(Node* node){
   if (node == NULL){
     return NULL;
@@ -117,7 +103,7 @@ Node* tail(Node* node){
     node = node->getNext();
    }
   return node;
-  }*/
+  }
   
   
 
@@ -136,6 +122,7 @@ Node* tail(Node* node){
    if (stackHead != NULL){
     return stackHead->getValue();
   }
+   
  }
 
 void enqueue(Node* &queueHead, Node* node, char value){//insert tail
@@ -160,20 +147,15 @@ void dequeue(Node* &queueHead){//remove head
   }
 }
  
-void* tree(Node* queueHead, Node* &stackHead) { // Create binary expression tree.
-  while (tail(queueHead) != NULL){
+void tree(Node* queueHead, Node* &stackHead) {
+  while (queueHead != NULL){
     if (peek(queueHead) >= '0' && peek(queueHead) <= '9'){
       push(stackHead, peek(queueHead));
     }
     else {
-      Node* node = new Node(peek(queueHead));
-      dequeue(queueHead);
-      node->setLeft(tail(stackHead));
-      pop(stackHead);
-      node->setRight(tail(stackHead));
-      pop(stackHead);
-      push(stackHead, peek(queueHead));
+      
     }
+    queueHead = queueHead->getNext();
   }
 }
 
