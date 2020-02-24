@@ -16,19 +16,19 @@ char peek(Node*);
 void enqueue(Node*&, Node*, char);
 void dequeue(Node*&);
 
-void tree(Node*, Node*&);
+Node* createTree(Node*, Node*&);
 void infix(Node*);
 void prefix(Node*);
 void postfix(Node*);
 
-Node* tail(Node*);
+//Node* tail(Node*);
 
 int main(){
   Node* stackHead = NULL;
   Node* expression = NULL;
   Node* queueHead = NULL;
   char* input = new char[40];
-  
+
   map<char, int> precedence;
 	precedence['^'] = 3;
 	precedence['*'] = 2;
@@ -42,11 +42,14 @@ int main(){
 	associativity['/'] = 'b';
 	associativity['+'] = 'b';
 	associativity['-'] = 'b';
-	
+
+	cout << "Enter: ";
   cin.getline(input, 40);
+  cout << "Postfix: ";
   for (int i = 0; i < strlen(input); i++){
     if (input[i] != ' '){
       if (isdigit(input[i])){//if a space
+	cout << input[i] << " ";
 	  enqueue(queueHead, queueHead, input[i]);
       }
       else if (input[i] == '('){//if left paren, push onto operator stack
@@ -55,6 +58,7 @@ int main(){
       else if (input[i] == ')'){//if right paren
 	Node* temp = stackHead;
 	while (peek(temp) != '('){
+	  cout << peek(temp) << " ";
 	  enqueue(queueHead, queueHead, peek(temp));
 	  pop(temp);
 	}
@@ -66,20 +70,26 @@ int main(){
 	     ((precedence[input[i]] < precedence[peek(stackHead)]) ||
 	     (precedence[input[i] == precedence[peek(stackHead)] &&
 			 associativity[input[i]] == 'a']))){
-	        enqueue(queueHead, queueHead, peek(stackHead));
-		pop(stackHead);
+	  cout << peek(stackHead) << " ";
+	  enqueue(queueHead, queueHead, peek(stackHead));
+	  pop(stackHead);
 	}
 	push(stackHead, input[i]);
       }
     }
   }
   while (stackHead != NULL){
+    cout << peek(stackHead) << " ";
     enqueue(queueHead, queueHead, peek(stackHead));
     pop(stackHead);
   }
-  tree(queueHead, stackHead);
+  cout << endl;
+  expression = createTree(queueHead, stackHead);
+  cout << "prefix: ";
   prefix(expression);
+  cout << "postfix: ";
   postfix(expression);
+  cout << "infix:  ";
   infix(expression);
   return 0;
 }
@@ -95,7 +105,7 @@ int main(){
     }
 }
 
-Node* tail(Node* node){
+/*Node* tail(Node* node){
   if (node == NULL){
     return NULL;
   }
@@ -104,7 +114,7 @@ Node* tail(Node* node){
    }
   return node;
   }
-  
+  */
   
 
  void push(Node* &stackHead, char value){//add node to head
@@ -142,24 +152,45 @@ void enqueue(Node* &queueHead, Node* node, char value){//insert tail
 void dequeue(Node* &queueHead){//remove head
   if (queueHead != NULL){
     Node* temp = queueHead;
-    queueHead = queueHead->getNext();
-    delete temp;
+    if (queueHead->getNext() != NULL){
+      queueHead = queueHead->getNext();
+      delete temp;
+    }
+    else{
+      delete temp;
+      queueHead = NULL;
+    }
   }
 }
  
-void tree(Node* queueHead, Node* &stackHead) {
+Node* createTree(Node* queueHead, Node* &stackHead) {
   while (queueHead != NULL){
     if (peek(queueHead) >= '0' && peek(queueHead) <= '9'){
-      push(stackHead, peek(queueHead));
+      Node* t = new Node(peek(queueHead));
+      push(stackHead, t->getValue());
     }
     else {
-      
+      Node* t = new Node(peek(queueHead));
+      Node* right = new Node(peek(stackHead));
+      cout << peek(stackHead) << endl;
+      cout << "right" << peek(right);
+      pop(stackHead);
+      Node* left = new Node(peek(stackHead));
+      cout << peek(stackHead) << endl;
+      cout <<"left"<< peek(left);
+      pop(stackHead);
+      t->setRight(right);
+      t->setLeft(left);
+      push(stackHead, peek(t));
     }
     queueHead = queueHead->getNext();
   }
+  Node* t = new Node(peek(stackHead));
+  pop(stackHead);
+  return t;
 }
 
-void infix(Node* stackHead) { // Traverse through with parentheses for PEMAS.
+void infix(Node* stackHead) {
 	if (stackHead != NULL) {
 		if (!isdigit(peek(stackHead))) {
 			cout << "(" << " ";
@@ -173,7 +204,7 @@ void infix(Node* stackHead) { // Traverse through with parentheses for PEMAS.
 	}
 }
 
-void prefix(Node* stackHead) { // Print prefix, print before continuing.
+void prefix(Node* stackHead) {
 	if (stackHead != NULL) {
 		cout << peek(stackHead) << " ";
 		prefix(stackHead->getLeft());
@@ -181,7 +212,7 @@ void prefix(Node* stackHead) { // Print prefix, print before continuing.
 	}
 }
 
-void postfix(Node* stackHead) { // Print postfix, print after continuing.
+void postfix(Node* stackHead) {
 	if (stackHead != NULL) {
 		postfix(stackHead->getLeft());
 		postfix(stackHead->getRight());
