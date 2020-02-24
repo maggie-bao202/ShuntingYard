@@ -23,14 +23,13 @@ void infix(Node*);
 void prefix(Node*);
 void postfix(Node*);
 
-bool checkInt(char*);
-
 int main(){
-  vector<char*> vinput;
   Node* stackHead = NULL;
+  Node* par = NULL;
+  Node* tree = NULL;
   Node* queueHead = NULL;
   char* input = new char[40];
-
+  
   map<char, int> precedence;
 	precedence['^'] = 3;
 	precedence['*'] = 2;
@@ -46,68 +45,65 @@ int main(){
 	associativity['-'] = 'b';
 
   cin.getline(input, 40, '\n');
-
-  char* temp = new char[strlen(input)]();
   int counter = 0;
   for (int i = 0; i < strlen(input); i++){
-    if (input[i] != ' '){
-      temp[counter++] = input[i];
+    if ('0' <= input[i] && input[i] <= '9'){//if char is a number
+      counter = counter * 10 + (input[i] - '0'); //get number, considering past digit
     }
     else {
-      vinput.push_back(temp);
-      temp = new char[strlen(input)]();
-      counter = 0;
-    }
-  }
-  if (temp != NULL){
-    vinput.push_back(temp);
-  }
-
-  vector<char*> :: iterator it;
-  for (it = vinput.begin(); it != vinput.end(); it++){
-    if (isdigit(*it)){
-      enqueue(queueHead, queueHead, *it);
-    }
-    if (strcmp(*it, "(") == 0){
-      Node* temp = new Node(*it);
-      push(stackHead, temp);
-    }
-    if (strcmp(*it, ")") == 0){
-      while (strcmp(peek(stackHead), "(") != 0){
-	enqueue(queueHead, queueHead, peek(stackHead));
-	pop(stackHead);
+      if (input[i] == ' '){//if a space
+	if(counter > 0){
+	  char c = (char) counter; //push the counter to queue
+	  char* cp = &c;
+	  enqueue(queueHead, queueHead, cp);
+	}
+	counter = 0;//reset counter once done
+      }
+      if (input[i] == '('){//if left paren push onto operator stack
+	char* cp = &input[i];
+	push(stackHead, cp);
+      }
+      if (input[i] == ')'){//if right paren
+	while (peek(stackHead) != '('){
+	  enqueue(queueHead, queueHead, peek(stackHead));
+	  pop(stackHead);
+	}
+	if (peek(stackHead) == ')'){
+	  pop(stackHead);
+	  delete peek(stackHead);
+        }
+      else{//if token is operator
+	while(peek(stackHead) != ' ' && peek(stackHead) != '(' &&
+	     ((precedence[input[i]] < precedence[peek(stackHead)]) ||
+	     (precedence[input[i] == precedence[peek(stackHead)] &&
+	      associativity[input[i]] == '1'))){
+	        enqueue(queueHead, queueHead, peek(stackHead));
+		pop(stackHead);
+	        push(stackHead, input[i]);
+	}
       }
     }
-    else {
-      while ((precedence[*it] < precedence[peek(stackHead)])
-	     ||(precedence[*it] == precedence[peek(stackHead)]
-	     && associativity[*it] == 'a'))
-	     && strcmp(peek(stackHead), " ") != 0
-	     && strcmp(peek(stackHead), "(") != 0){
-      enqueue(queueHead, queueHead, peek(stackHead));
-      pop(stackHead);
-    }
-    /*Node* temp0 = new Node(*it);
-    push(stackHead, temp0);
   }
-  Node* node = NULL;
-  while (peek(node) != NULL){
-    enqueue(queueHead, pop(node));
+    if (counter != 0){
+      char c = (char) counter;
+      char* cp = &c;
+      enqueue(queueHead, queueHead, cp); 
   }
-  while(dequeue(queueHead)){
-    if (!isdigit(dequeue(queueHead)){
-    Node* temp1 = new Node*/
+  while (stackHead->getNext() != NULL){
+    enqueue(queueHead, queueHead, peek(stackHead));
+    pop(stackHead);
+  }
   return 0;
 }
 
-void pop(Node* &stackHead){
+  void pop(Node* &stackHead){//remove head node
   Node* temp = stackHead;
   stackHead = stackHead->getNext();
   delete temp;
   temp = NULL;
 }
 
-void push(Node* &stackHead, char* value){
+ void push(Node* &stackHead, char* value){//add node to head
   if (stackHead == NULL){
     Node* current = new Node(value);
     stackHead = current;
@@ -162,5 +158,16 @@ void infix(Node* node){
   if (node != NULL){
     if(node){
     }
+  }
+}
+
+ void postfix(Node* head) {
+  if (head) {
+    //Recurse on left node
+    printPostfix(head -> getLeft());
+    //Recurse on right node
+    printPostfix(head -> getRight());
+    //Print this node 
+    cout << head -> getValue() << " ";
   }
 }

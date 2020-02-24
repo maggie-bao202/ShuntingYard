@@ -8,6 +8,7 @@ Node :: Node(char* newvalue){
   next = NULL;
   left = NULL;
   right = NULL;
+  //check = newcheck;
 }
 
 char* Node :: getValue(){
@@ -26,6 +27,10 @@ Node* Node :: getNext(){
   return next;
 }
 
+/*bool Node :: getCheck(){
+  return check;
+  }*/
+
 void Node :: setValue(char* newvalue){
   value = newvalue;
 }
@@ -41,6 +46,10 @@ void Node :: setRight(Node* newright){
 void Node :: setNext(Node* newnext){
   next = newnext;
 }
+
+/*bool Node :: setCheck(bool newcheck){
+  check = newcheck;
+}*/
 
 Node :: ~Node(){
   //delete value;
