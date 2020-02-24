@@ -7,20 +7,20 @@ using namespace std;
 
 class Node{
  public:
-  Node(char* newvalue, bool check);
-  char* getValue();
+  Node(char newvalue);
+  char getValue();
   Node* getNext();
   Node* getLeft();
   Node* getRight();
   //bool getCheck();
-  void setValue(char* newvalue);
-  void setNext(char* newnext);
+  void setValue(char newvalue);
+  void setNext(Node* newnext);
   void setLeft(Node* newleft);
   void setRight(Node* newright);
   //bool setCheck(bool newcheck);
   ~Node();
  private:
-  char* value;
+  char value;
   Node* next;
   Node* left;
   Node* right;

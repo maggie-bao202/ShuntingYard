@@ -3,7 +3,7 @@
 
 using namespace std;
 
-Node :: Node(char* newvalue){
+Node :: Node(char newvalue){
   value = newvalue;
   next = NULL;
   left = NULL;
@@ -11,7 +11,7 @@ Node :: Node(char* newvalue){
   //check = newcheck;
 }
 
-char* Node :: getValue(){
+char Node :: getValue(){
   return value;
 }
 
@@ -31,7 +31,7 @@ Node* Node :: getNext(){
   return check;
   }*/
 
-void Node :: setValue(char* newvalue){
+void Node :: setValue(char newvalue){
   value = newvalue;
 }
 
