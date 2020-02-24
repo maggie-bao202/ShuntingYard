@@ -17,15 +17,18 @@ char peek(Node*);
 
 //QUEUE FUNCTIONS
 void enqueue(Node*&, Node*, char);
-void dequeue(Node*);
+void dequeue(Node*&);
 
+void tree(Node*, Node*&);
 void infix(Node*);
 void prefix(Node*);
 void postfix(Node*);
 
+//Node* tail(Node*);
+
 int main(){
   Node* stackHead = NULL;
-  Node* tree = NULL;
+  Node* expression = NULL;
   Node* queueHead = NULL;
   char* input = new char[40];
   
@@ -42,33 +45,25 @@ int main(){
 	associativity['/'] = 'b';
 	associativity['+'] = 'b';
 	associativity['-'] = 'b';
-
-  cin.getline(input, 40, '\n');
-  int counter = 0;
+	
+  cin.getline(input, 40);
   for (int i = 0; i < strlen(input); i++){
-    if ('0' <= input[i] && input[i] <= '9'){//if char is a number
-      counter = counter * 10 + (input[i] - '0'); //get number, considering past digit
-    }
-    else {
-      if (input[i] == ' '){//if a space
-	if(counter > 0){
-	  char c = (char) counter; //push the counter to queue
-	  enqueue(queueHead, queueHead, c);
-	}
-	counter = 0;//reset counter once done
+    if (input[i] != ' '){
+      if (isdigit(input[i])){//if a space
+	  enqueue(queueHead, queueHead, input[i]);
       }
-      if (input[i] == '('){//if left paren push onto operator stack
+      else if (input[i] == '('){//if left paren, push onto operator stack
 	push(stackHead, input[i]);
       }
-      if (input[i] == ')'){//if right paren
-	while (stackHead && peek(stackHead) != '('){
-	  //
-	  enqueue(queueHead, queueHead, peek(stackHead));
-	  pop(stackHead);
+      else if (input[i] == ')'){//if right paren
+	Node* temp = stackHead;
+	while (peek(temp) != '('){
+	  enqueue(queueHead, queueHead, peek(temp));
+	  pop(temp);
 	}
-	if (peek(stackHead) == ')'){
-	  pop(stackHead);
-        }
+	stackHead = temp->getNext();
+	delete temp;
+      }
       else{//if token is operator
 	while(peek(stackHead) != ' ' && peek(stackHead) != '(' &&
 	     ((precedence[input[i]] < precedence[peek(stackHead)]) ||
@@ -76,66 +71,72 @@ int main(){
 			 associativity[input[i]] == 'a']))){
 	        enqueue(queueHead, queueHead, peek(stackHead));
 		pop(stackHead);
-	        push(stackHead, input[i]);
 	}
+	push(stackHead, input[i]);
       }
     }
   }
-  }
-    if (counter != 0){
-      char c = (char) counter;
-      enqueue(queueHead, queueHead, c); 
-  }
-  while (stackHead->getNext() != NULL){
+  while (stackHead != NULL){
     enqueue(queueHead, queueHead, peek(stackHead));
     pop(stackHead);
   }
+  char* postfix = new char[100];
+	int num = 0;
+	while (queueHead != NULL) { // Empty queue into a char array.
+		char qHead = peek(queueHead);
+		dequeue(queueHead);
+		postfix[num] = qHead;
+		postfix[num+1] = ' ';
+		num += 2;
+	}
+	postfix[num] = '\0';
+	cout << postfix << endl;
+  tree(queueHead, stackHead);
+  prefix(expression);
+  postfix(expression);
+  infix(expression);
   return 0;
 }
 
   void pop(Node* &stackHead){//remove head node
-    if (stackHead == NULL){
-      cout << "Nothing" << endl;
-    }
-    else{
+    if (stackHead != NULL){
       Node* temp = stackHead;
       stackHead = stackHead->getNext();
       delete temp;
-      temp = NULL;
+    }
+    else {
+      return;
     }
 }
+/*
+Node* tail(Node* node){
+  if (node == NULL){
+    return NULL;
+  }
+  while (node->getNext() != NULL){
+    node = node->getNext();
+   }
+  return node;
+  }*/
+  
+  
 
  void push(Node* &stackHead, char value){//add node to head
-  if (stackHead == NULL){
-    stackHead = new Node(value);
-    return;
-  }
-  else{
-    Node* temp = stackHead;
-    stackHead = new Node(value);
-    stackHead->setNext(temp);
-    return;
-  }
+   if (stackHead != NULL){
+     Node* temp = stackHead;
+     stackHead = new Node(value);
+     stackHead->setNext(temp);
+   }
+   else{
+     stackHead = new Node(value);
+   }
  }
 
  char peek(Node* stackHead){
-  if (stackHead == NULL){
-    return NULL;
-  }
-  else{
+   if (stackHead != NULL){
     return stackHead->getValue();
   }
  }
- 
- /*char* tail(Node* stackHead){
-   if (
-    
-  while (stackHead->getNext() != NULL){
-    stackHead = stackHead->getNext();
-  }
-  char* value = stackHead->getValue();
-  return value;
-}*/
 
 void enqueue(Node* &queueHead, Node* node, char value){//insert tail
    if (node == NULL){ //if node pointer does not exist
@@ -155,28 +156,54 @@ void dequeue(Node* &queueHead){//remove head
   if (queueHead != NULL){
     Node* temp = queueHead;
     queueHead = queueHead->getNext();
-    temp->setNext(NULL);
     delete temp;
-  }
-  else{
-    cout << "Nothing" << endl;
   }
 }
  
-void infix(Node* node){
-  if (node != NULL){
-    if(node){
+void* tree(Node* queueHead, Node* &stackHead) { // Create binary expression tree.
+  while (tail(queueHead) != NULL){
+    if (peek(queueHead) >= '0' && peek(queueHead) <= '9'){
+      push(stackHead, peek(queueHead));
+    }
+    else {
+      Node* node = new Node(peek(queueHead));
+      dequeue(queueHead);
+      node->setLeft(tail(stackHead));
+      pop(stackHead);
+      node->setRight(tail(stackHead));
+      pop(stackHead);
+      push(stackHead, peek(queueHead));
     }
   }
 }
 
- void postfix(Node* head) {
-  if (head) {
-    //Recurse on left node
-    postfix(head -> getLeft());
-    //Recurse on right node
-    postfix(head -> getRight());
-    //Print this node 
-    cout << head -> getValue() << " ";
-  }
+void infix(Node* stackHead) { // Traverse through with parentheses for PEMAS.
+	if (stackHead != NULL) {
+		if (!isdigit(peek(stackHead))) {
+			cout << "(" << " ";
+		}
+		infix(stackHead->getLeft());
+		cout << peek(stackHead) << " ";
+		infix(stackHead->getRight());
+		if (!isdigit(peek(stackHead))) {
+			cout << ")" << " ";
+		}
+	}
+}
+
+void prefix(Node* stackHead) { // Print prefix, print before continuing.
+	if (stackHead != NULL) {
+		cout << peek(stackHead) << " ";
+		prefix(stackHead->getLeft());
+		prefix(stackHead->getRight());
+	}
+}
+
+void postfix(Node* stackHead) { // Print postfix, print after continuing.
+	if (stackHead != NULL) {
+		postfix(stackHead->getLeft());
+		postfix(stackHead->getRight());
+		cout << peek(stackHead) << " ";
+	}
+
 }
