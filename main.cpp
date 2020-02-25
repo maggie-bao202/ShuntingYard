@@ -1,6 +1,5 @@
 #include <iostream>
 #include "Node.h"
-#include <iterator>
 #include <map>
 #include <cstring>
 #include <cctype>
@@ -16,34 +15,31 @@ char peek(Node*);
 void enqueue(Node*&, Node*, char);
 void dequeue(Node*&);
 
-Node* createTree(Node*, Node*&);
+void createTree(Node*&, Node*);
 void infix(Node*);
 void prefix(Node*);
 void postfix(Node*);
 
-//Node* tail(Node*);
-
 int main(){
-  Node* stackHead = NULL;
-  Node* expression = NULL;
-  Node* queueHead = NULL;
   char* input = new char[40];
-
+  bool stillPlaying = false;
   map<char, int> precedence;
-	precedence['^'] = 3;
-	precedence['*'] = 2;
-	precedence['/'] = 2;
-	precedence['+'] = 1;
-	precedence['-'] = 1;
+        precedence['^'] = 2;
+        precedence['*'] = 1;
+        precedence['/'] = 1;
+        precedence['+'] = 0;
+        precedence['-'] = 0;
 
   map<char, char> associativity;
-	associativity['^'] = 'a';
+	associativity['-'] = 'b';
+	associativity['+'] = 'b';
 	associativity['*'] = 'b';
 	associativity['/'] = 'b';
-	associativity['+'] = 'b';
-	associativity['-'] = 'b';
-
-	cout << "Enter: ";
+	associativity['^'] = 'a';
+  do {
+  Node* stackHead = NULL;
+  Node* queueHead = NULL;
+  cout << "Enter in an expression, using operators '+', '-', '*', '/', and '^': " << endl;
   cin.getline(input, 40);
   cout << "Postfix: ";
   for (int i = 0; i < strlen(input); i++){
@@ -66,7 +62,7 @@ int main(){
 	delete temp;
       }
       else{//if token is operator
-	while(peek(stackHead) != ' ' && peek(stackHead) != '(' &&
+	while(peek(stackHead) != '(' && peek(stackHead) != ' ' &&
 	     ((precedence[input[i]] < precedence[peek(stackHead)]) ||
 	     (precedence[input[i] == precedence[peek(stackHead)] &&
 			 associativity[input[i]] == 'a']))){
@@ -84,13 +80,48 @@ int main(){
     pop(stackHead);
   }
   cout << endl;
-  expression = createTree(queueHead, stackHead);
-  cout << "prefix: ";
-  prefix(expression);
-  cout << "postfix: ";
-  postfix(expression);
-  cout << "infix:  ";
-  infix(expression);
+  createTree(stackHead, queueHead);
+  cout << endl;
+  cout << "Binary Expression Tree Created." << endl;
+  cout << "INFIX" << endl;
+  infix(stackHead);
+  cout << endl;
+  cout << "PREFIX" << endl;
+  prefix (stackHead);
+  cout << endl;
+  cout << "POSTFIX" << endl;
+  postfix(stackHead);
+  cout << endl;
+  bool again = true;//will continue prompting for keyword until quit
+  while(again == true){
+    cout << endl;
+     cout << "Enter a keyword to display \"INFIX\", \"PREFIX\", or \"POSTFIX\". Enter \"NEW\" to input a new expression. Enter \"QUIT\" to exit."<< endl;
+    cin.get(input, 10); //put into array of 10. Extra char will be ignored
+    cin.clear(); //clear, ignore fixes null bug
+    cin.ignore(9999, '\n');
+    if (strcmp(input, "INFIX") == 0){//if keyword char pointer matches with str
+      infix(stackHead);
+    }
+    else if (strcmp(input, "PREFIX") == 0){
+      prefix(stackHead);
+    }
+    else if (strcmp(input, "POSTFIX") == 0){
+      postfix(stackHead);
+    }
+    else if(strcmp(input, "NEW") == 0){
+      stillPlaying = true;
+      again = false;
+    }
+    else if (strcmp(input, "QUIT") == 0){
+      cout << "Have a nice day!" << endl;
+      stillPlaying = false;
+      again = false;
+    }
+    else{
+      cout << "Make sure the keyword is capitalized." << endl;
+    }
+  }
+  }while(stillPlaying == true);
   return 0;
 }
 
@@ -104,18 +135,6 @@ int main(){
       return;
     }
 }
-
-/*Node* tail(Node* node){
-  if (node == NULL){
-    return NULL;
-  }
-  while (node->getNext() != NULL){
-    node = node->getNext();
-   }
-  return node;
-  }
-  */
-  
 
  void push(Node* &stackHead, char value){//add node to head
    if (stackHead != NULL){
@@ -162,54 +181,58 @@ void dequeue(Node* &queueHead){//remove head
     }
   }
 }
+
+/*Node* tail(Node* &stackHead){
+  Node* current = stackHead;
+  while (stackHead != NULL){
+    while (current->getNext() != NULL){
+      current = current->getNext();
+    }
+    return current;
+}*/
  
-Node* createTree(Node* queueHead, Node* &stackHead) {
+void createTree(Node* &stackHead, Node* queueHead) {
   while (queueHead != NULL){
-    if (peek(queueHead) >= '0' && peek(queueHead) <= '9'){
-      Node* t = new Node(peek(queueHead));
-      push(stackHead, t->getValue());
+    if (isdigit(peek(queueHead))){//if it is a number
+      push(stackHead, peek(queueHead));//push onto the stack
     }
-    else {
-      Node* t = new Node(peek(queueHead));
-      Node* right = new Node(peek(stackHead));
-      cout << peek(stackHead) << endl;
-      cout << "right" << peek(right);
+    else{//if operator
+      Node* b = new Node(peek(stackHead));//pointers a and b are popped from stack
+      b->setLeft(stackHead->getLeft());
+      b->setRight(stackHead->getRight());
       pop(stackHead);
-      Node* left = new Node(peek(stackHead));
-      cout << peek(stackHead) << endl;
-      cout <<"left"<< peek(left);
+      Node* a = new Node(peek(stackHead));
+      a->setLeft(stackHead->getLeft());
+      a->setRight(stackHead->getRight());
       pop(stackHead);
-      t->setRight(right);
-      t->setLeft(left);
-      push(stackHead, peek(t));
+      push(stackHead, peek(queueHead));
+      stackHead->setRight(b);
+      stackHead->setLeft(a);
     }
-    queueHead = queueHead->getNext();
+      queueHead = queueHead->getNext();
   }
-  Node* t = new Node(peek(stackHead));
-  pop(stackHead);
-  return t;
 }
 
 void infix(Node* stackHead) {
-	if (stackHead != NULL) {
-		if (!isdigit(peek(stackHead))) {
-			cout << "(" << " ";
-		}
-		infix(stackHead->getLeft());
-		cout << peek(stackHead) << " ";
-		infix(stackHead->getRight());
-		if (!isdigit(peek(stackHead))) {
-			cout << ")" << " ";
-		}
-	}
+  if (stackHead != NULL) {
+    if (!isdigit(peek(stackHead))) {
+      cout << "( ";
+    }
+    infix(stackHead->getLeft());
+    cout << peek(stackHead) << " ";
+    infix(stackHead->getRight());
+    if (!isdigit(peek(stackHead))) {
+      cout << ") ";
+    }
+  }
 }
 
 void prefix(Node* stackHead) {
-	if (stackHead != NULL) {
-		cout << peek(stackHead) << " ";
-		prefix(stackHead->getLeft());
-		prefix(stackHead->getRight());
-	}
+  if (stackHead != NULL) {
+    cout << peek(stackHead) << " ";
+    prefix(stackHead->getLeft());
+    prefix(stackHead->getRight());
+  }
 }
 
 void postfix(Node* stackHead) {
