@@ -5,6 +5,7 @@
 #include <cctype>
 
 using namespace std;
+/*Author: Maggie Bao. Description: Shuntingyard takes an expression from input, and prints out the infix, prefix, and/or postfix by converting it into a binary expression tree.*/
 
 //STACK FUNCTIONS
 void pop(Node* &);
@@ -16,6 +17,8 @@ void enqueue(Node*&, Node*, char);
 void dequeue(Node*&);
 
 void createTree(Node*&, Node*);
+
+//RECURSIVE PRINTS
 void infix(Node*);
 void prefix(Node*);
 void postfix(Node*);
@@ -23,6 +26,9 @@ void postfix(Node*);
 int main(){
   char* input = new char[40];
   bool stillPlaying = false;
+
+  //Maps used to rank order of operators.
+  
   map<char, int> precedence;
         precedence['^'] = 2;
         precedence['*'] = 1;
@@ -36,6 +42,7 @@ int main(){
 	associativity['*'] = 'b';
 	associativity['/'] = 'b';
 	associativity['^'] = 'a';
+	
   do {
   Node* stackHead = NULL;
   Node* queueHead = NULL;
