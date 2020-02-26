@@ -2,11 +2,11 @@
 #define NODE_H
 
 #include <iostream>
-
+//Includes the function prototypes for the node class. getters and setters for left and right node pointers are used in the binary expression tree.
 using namespace std;
 
 class Node{
- public:
+public://functions
   Node(char newvalue);
   char getValue();
   Node* getNext();
@@ -17,7 +17,7 @@ class Node{
   void setLeft(Node* newleft);
   void setRight(Node* newright);
   ~Node();
- private:
+private://variables
   char value;
   Node* next;
   Node* left;

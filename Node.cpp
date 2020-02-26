@@ -3,12 +3,14 @@
 
 using namespace std;
 
-Node :: Node(char newvalue){
+Node :: Node(char newvalue){//Constructor requires a value. All pointers are set to NULL by default
   value = newvalue;
   next = NULL;
   left = NULL;
   right = NULL;
 }
+
+//getters
 
 char Node :: getValue(){
   return value;
@@ -26,6 +28,8 @@ Node* Node :: getNext(){
   return next;
 }
 
+//setters
+
 void Node :: setValue(char newvalue){
   value = newvalue;
 }
@@ -42,7 +46,7 @@ void Node :: setNext(Node* newnext){
   next = newnext;
 }
 
-Node :: ~Node(){
+Node :: ~Node(){//Destructor
   //delete value;
   //left = NULL;
   //right = NULL;
